@@ -35,6 +35,7 @@ const Post = function (post) {
   this.city = post.city;
   this.zipcode = post.zipcode;
   this.address = post.address;
+  this.address = post.address;
 
   this.responder_id = post.responder_id;
   this.operator_id = post.operator_id;
@@ -58,14 +59,14 @@ Users.getUsers = (result) => {
         result(err, null);
         return;
       }
-      const agentDetails = res.map((row) => ({
+      const userDetails = res.map((row) => ({
         username: row.username,
         password: row.password,
         role: row.role,
       }));
 
-      console.log(...agentDetails);
-      result(null, agentDetails);
+      console.log(...userDetails);
+      result(null, userDetails);
     }
   );
 };
@@ -136,7 +137,7 @@ Users.getAdmin = (result) => {
 };
 Users.getOperator = (result) => {
   sql.query(
-    "SELECT operator_id	, user_id, first_name,last_name, gender,birthdate, address, email FROM operator",
+    "SELECT operator_id	, user_id, first_name,last_name, gender,birthdate, address, email, mobile_number FROM operator",
     (err, res) => {
       if (err) {
         console.log("Error in executing property_nearest_table query: ", err);
@@ -152,6 +153,7 @@ Users.getOperator = (result) => {
         birthdate: row.birthdate,
         address: row.address,
         email: row.email,
+        mobile_number: row.mobile_number,
 
       }));
 
@@ -272,7 +274,8 @@ Users.addOperator = (newOperator, result) => {
           birthdate: newOperator.birthdate,
           address: newOperator.address,
           email: newOperator.email,
-    
+          mobile_number: newOperator.mobile_number,
+
         });
 
 

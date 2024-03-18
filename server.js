@@ -15,7 +15,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.get("/", (req, res) => {
-    res.json({ message: "KONEK NAKAS PORT 8080" });
+    res.json({ message: "WHAT THE HAILL" });
 });
 
 // Require and use the routes module, passing the app instance

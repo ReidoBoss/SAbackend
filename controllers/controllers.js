@@ -1,6 +1,7 @@
 
 
 const { Users, Post} = require("../models/models.js");
+
 // start swift aid backend
 exports.getUsers = (req, res) => {
   if (!req.body) {
@@ -185,6 +186,7 @@ exports.addOperator = (req, res) => {
     birthdate: req.body.birthdate,
     address: req.body.address,
     email: req.body.email,
+    mobile_number: req.body.mobile_number,
 
 
   });
