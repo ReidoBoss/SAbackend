@@ -38,6 +38,42 @@ exports.getUserImage = (req, res) => {
   });
 };
 
+exports.getSinglePost = (req, res) => {
+  if (!req.body) {
+    res.status(400).send({
+      message: "Content cannot be empty",
+    });
+    return;
+  }
+  console.log(req.body);
+  Users.getSinglePost(req.params.id, (err, post) => {
+    if (err) {
+      return res.status(500).send({
+        message: err.message || "Some error occured",
+      });
+    }
+    res.send(post);
+  });
+};
+
+
+exports.getSinglePostReport = (req, res) => {
+  if (!req.body) {
+    res.status(400).send({
+      message: "Content cannot be empty",
+    });
+    return;
+  }
+  console.log(req.body);
+  Post.getSinglePostReport(req.params.id, (err, post) => {
+    if (err) {
+      return res.status(500).send({
+        message: err.message || "Some error occured",
+      });
+    }
+    res.send(post);
+  });
+};
 
 exports.getAdmin = (req, res) => {
   if (!req.body) {
@@ -67,6 +103,24 @@ exports.getOperator = (req, res) => {
     if (err) {
       return res.status(500).send({
         message: err.message || "Some error message",
+      });
+    }
+    res.send(operator);
+  });
+};
+
+exports.getSingleOperator = (req, res) => {
+  if (!req.body) {
+    res.status(400).send({
+      message: "Content cannot be empty",
+    });
+    return;
+  }
+  console.log(req.body);
+  Users.getSingleOperator(req.params.id, (err, operator) => {
+    if (err) {
+      return res.status(500).send({
+        message: err.message || "Some error occured",
       });
     }
     res.send(operator);
@@ -301,6 +355,36 @@ exports.addPost = (req, res) => {
   });
 };
 
+exports.addPostTeam = (req, res) => {
+  if (!req.body) {
+    res.status(400).send({
+      message: "Content cannot be empty",
+    });
+  }
+  
+
+  const postTeams = new Post({
+    post_id: req.body.post_id,
+    search_and_rescue: req.body.search_and_rescue,
+    fire_department: req.body.fire_department,
+    ngo: req.body.ngo,
+    private_sector: req.body.private_sector,
+    baranggay_tanod: req.body.baranggay_tanod,
+
+  });
+
+  Post.addPostTeam(postTeams, (err, data) => {
+    if (err) {
+      return res.status(500).send({
+        message:
+          err.message || "Some error occurred while creating the Property.",
+      });
+    }
+
+    res.send(data);
+  });
+};
+
 
 exports.markPostAcknowledged = (req, res) => {
   if (!req.params.id) {
@@ -334,7 +418,7 @@ exports.markPostDenied = (req, res) => {
   }
 
   const postId = req.params.id;
-  const newStatus = "denied"; 
+  const newStatus = "cancelled"; 
 
   Post.editPostStatus(postId, newStatus, (err, data) => {
     if (err) {
@@ -348,3 +432,69 @@ exports.markPostDenied = (req, res) => {
   });
 };
 
+exports.markPostSent = (req, res) => {
+  if (!req.params.id) {
+    res.status(400).send({
+      message: "Post ID cannot be empty",
+    });
+    return;
+  }
+
+  const postId = req.params.id;
+  const newStatus = "sent"; 
+
+  Post.editPostStatus(postId, newStatus, (err, data) => {
+    if (err) {
+      return res.status(500).send({
+        message:
+          err.message || "Some error occurred while updating the Post status.",
+      });
+    }
+
+    res.send(data);
+  });
+};
+
+
+
+
+
+exports.markPostDenied = (req, res) => {
+  if (!req.params.id) {
+    return res.status(400).send({
+      message: "Post ID cannot be empty",
+    });
+  }
+
+  const postId = req.params.id;
+  const newStatus = "cancelled";
+
+  Post.editPostStatus(postId, newStatus, (err, data) => {
+    if (err) {
+      return res.status(500).send({
+        message: err.message || "Some error occurred while updating the Post status.",
+      });
+    }
+
+    res.send(data);
+  });
+};
+
+//editor
+exports.updatePost = (req, res) => {
+  const { responder_id, operator_id, additional_description, post_id } = req.body;
+
+  const updatePost = {
+    responder_id,
+    operator_id,
+    additional_description,
+    post_id
+  };
+
+  Post.updatePost(updatePost, (error, result) => {
+    if (error) {
+      return res.status(500).json({ error: 'Could not update post' });
+    }
+    return res.status(200).json({ message: 'Post updated successfully', data: result });
+  });
+};

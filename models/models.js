@@ -41,7 +41,12 @@ const Post = function (post) {
   this.operator_id = post.operator_id;
   this.additional_description = post.additional_description;
 
-  
+  //
+  this.search_and_rescue = post.search_and_rescue;
+  this.fire_department = post.fire_department;
+  this.ngo = post.ngo;
+  this.private_sector = post.private_sector;
+  this.baranggay_tanod = post.baranggay_tanod;
 
 };
 
@@ -55,7 +60,7 @@ Users.getUsers = (result) => {
     "SELECT username, password,role FROM users",
     (err, res) => {
       if (err) {
-        console.log("Error in executing property_nearest_table query: ", err);
+        console.log("Error in executing getuseres query: ", err);
         result(err, null);
         return;
       }
@@ -163,6 +168,33 @@ Users.getOperator = (result) => {
   );
 };
 
+Users.getSingleOperator = (operator_id, result) => {
+  sql.query(
+    "SELECT   first_name,last_name, gender, birthdate, address, email,mobile_number FROM operator WHERE operator_id= ? ",
+    [operator_id],
+    (error, queryResult) => {
+      if (error) {
+        console.log("Error in executing operator table query", error);
+        result(error, null);
+        return;
+      }
+      const operator_result = queryResult.map((row) => ({
+        operator_id: row.operator_id,
+        first_name: row.first_name,
+        last_name: row.last_name,
+        gender: row.gender,
+        birthdate: row.birthdate,
+        address: row.address,
+        email: row.email,
+        mobile_number: row.mobile_number,
+      }));
+
+
+      result(null, operator_result);
+    }
+  );
+};
+
 Users.getResponder = (result) => {
   sql.query(
     "SELECT responder_id	, user_id, department,institution, mobile_number, email, city, zipcode, address FROM responder",
@@ -218,6 +250,33 @@ Users.getPost = (result) => {
   );
 };
 
+Users.getSinglePost = (post_id, result) => {
+  sql.query(
+    "SELECT  description, timestamp, emergency_type, city, zipcode, address FROM post WHERE post_id= ? ",
+    [post_id],
+    (error, queryResult) => {
+      if (error) {
+        console.log("Error in executing property_table query", error);
+        result(error, null);
+        return;
+      }
+      const post_result = queryResult.map((row) => ({
+        post_id: row.post_id,
+        description: row.description,
+        timestamp: row.timestamp,
+        emergency_type: row.emergency_type,
+        city: row.city,
+        zipcode: row.zipcode,
+        address: row.address,
+
+      }));
+
+
+      result(null, post_result);
+    }
+  );
+};
+
 Users.getPostReport = (result) => {
   sql.query(
     "SELECT report_id, post_id, responder_id, operator_id, additional_description FROM post_report",
@@ -241,6 +300,32 @@ Users.getPostReport = (result) => {
     }
   );
 };
+Post.getSinglePostReport = (report_id, result) => {
+  sql.query(
+    "SELECT  post_id, responder_id, operator_id, additional_description FROM post_report WHERE report_id= ? ",
+    [report_id],
+    (error, queryResult) => {
+      if (error) {
+        console.log("Error in executing property_table query", error);
+        result(error, null);
+        return;
+      }
+      const post_result = queryResult.map((row) => ({
+        post_id: row.post_id,
+        responder_id: row.responder_id,
+        operator_id: row.operator_id,
+        additional_description: row.additional_description,
+
+      }));
+
+
+      result(null, post_result);
+    }
+  );
+};
+
+
+//----------------------------------------------------
 //POSTERS
 
 
@@ -378,6 +463,56 @@ Post.editPostStatus = (postId, newStatus, result) => {
     }
   );
 };
+
+
+
+
+//
+Post.addPostTeam = (postTeam, result) => {
+  sql.query(
+    "INSERT INTO post_additional_team SET ?",
+    {
+      post_id: postTeam.post_id,
+      search_and_rescue: postTeam.search_and_rescue,
+      fire_department: postTeam.fire_department,
+      ngo: postTeam.ngo,
+      private_sector: postTeam.private_sector,
+      baranggay_tanod: postTeam.baranggay_tanod,
+
+    },
+    (error, results) => {
+      if (error) {
+        console.log("error: ", error);
+        result(error, null);
+        return;
+      }
+      result(null, { ...postTeam });
+    }
+  );
+};
+
+//editors
+Post.updatePost = (updatePost, result) => {
+  sql.query(
+    "UPDATE post_report SET responder_id = ?, operator_id = ?, additional_description = ? WHERE post_id = ?",
+    [updatePost.responder_id, updatePost.operator_id, updatePost.additional_description, updatePost.post_id],
+    (error, results) => {
+      if (error) {
+        console.log("error: ", error);
+        result(error, null);
+        return;
+      }
+      if (results.affectedRows === 0) {
+        // If no rows were affected, it means there was no matching post_id
+        result({ kind: "not_found" }, null);
+        return;
+      }
+      result(null, { ...updatePost });
+    }
+  );
+}
+
+
 
 
 
